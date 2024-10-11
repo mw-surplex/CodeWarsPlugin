@@ -54,8 +54,7 @@ public class Manager implements KataSetupServiceClient {
         setupTabs();
     }
 
-    public void setupTabs(){
-
+    public void setupTabs() {
         var browserComponent = browser.getComponent();
         browserComponent.setPreferredSize(new Dimension(5000, 5000));
         browserPanel.add(browserComponent, BorderLayout.CENTER);
@@ -79,9 +78,6 @@ public class Manager implements KataSetupServiceClient {
     }
 
     public void refresh() {
-
-
-
         if (submitPanel != null && selectorPanel != null) {
             sidePanel.remove(submitPanel);
             sidePanel.remove(selectorPanel);
@@ -90,15 +86,12 @@ public class Manager implements KataSetupServiceClient {
         submitPanel = new KataSubmitPanel(store);
         selectorPanel = new KataSelectorPanel(store, this);
 
-
-
         sidePanel.add(selectorPanel, BorderLayout.SOUTH);
         sidePanel.add(submitPanel, BorderLayout.NORTH);
 
-        if(store.getDirectory() != null && !browser.getCefBrowser().getURL().equals(store.getDirectory().getRecord().getWorkUrl())) {
+        if (store.getDirectory() != null && !browser.getCefBrowser().getURL().equals(store.getDirectory().getRecord().getWorkUrl())) {
             browser.loadURL(store.getDirectory().getRecord().getWorkUrl());
         }
-
 
         sidePanel.revalidate();
         sidePanel.repaint();
@@ -109,15 +102,17 @@ public class Manager implements KataSetupServiceClient {
         return new CefLoadHandlerAdapter() {
             @Override
             public void onLoadEnd(CefBrowser browser, CefFrame frame, int httpStatusCode) {
-                if(frame.getURL().equals(SIGN_IN_URL)) {
+                if (frame.getURL().equals(SIGN_IN_URL)) {
                     ApplicationManager.getApplication().invokeLater(() -> {
                         sidePanel.removeAll();
                         setupTabs();
                     });
 
-                } else if((frame.getURL().equals(DASHBOARD_URL) || frame.getURL().equals(SETUP_URL)) && ((previousUrl.equals(SIGN_IN_URL) || previousUrl.contains("github")) || previousUrl.equals(""))){
+                } else if ((frame.getURL().equals(DASHBOARD_URL) || frame.getURL().equals(SETUP_URL))
+                        && ((previousUrl.equals(SIGN_IN_URL) || previousUrl.contains("github")) || previousUrl.equals(""))) {
                     ApplicationManager.getApplication().invokeLater(() -> getCookies());
-                } else if(browser.getURL().contains("train") && !browser.getURL().contains("trainer") && shouldFetchAndCreateFilesOnUrlLoad.get() && !previousUrl.equals(browser.getURL())) {
+                } else if (browser.getURL().contains("train") && !browser.getURL().contains("trainer")
+                        && shouldFetchAndCreateFilesOnUrlLoad.get() && !previousUrl.equals(browser.getURL())) {
                     ApplicationManager.getApplication().invokeLater(() -> {
                         showOverlaySpinner(true);
                         sidePanel.revalidate();
@@ -138,7 +133,7 @@ public class Manager implements KataSetupServiceClient {
         refresh();
     }
 
-    public void setupKata(String url){
+    public void setupKata(String url) {
         setupService.setup(url, project, this);
     }
 
@@ -149,7 +144,6 @@ public class Manager implements KataSetupServiceClient {
 
     @Override
     public void notifyKataFileCreationFail(String reason) {
-
         ApplicationManager.getApplication().invokeLater(() -> {
             this.showOverlaySpinner(false);
             browser.loadURL(DASHBOARD_URL);
@@ -165,21 +159,20 @@ public class Manager implements KataSetupServiceClient {
 
     @Override
     public void loadKata(KataDirectory directory, boolean loadUrl) {
-
         store.setCurrentKataDirectory(directory);
         refresh();
-        if(loadUrl && directory.getRecord().getWorkUrl() != null) {
+        if (loadUrl && directory.getRecord().getWorkUrl() != null) {
             browser.loadURL(directory.getRecord().getWorkUrl());
         }
         WriteCommandAction.runWriteCommandAction(project, openFiles(directory));
     }
+
     public void reloadWorkspace() {
         refresh();
     }
 
     @Override
     public void loadWorkspace(KataDirectory directory, boolean loadUrl) {
-
         store.setCurrentKataDirectory(directory);
         WriteCommandAction.runWriteCommandAction(project, openFiles(directory));
 
@@ -191,7 +184,7 @@ public class Manager implements KataSetupServiceClient {
     }
 
     public void showOverlaySpinner(boolean show) {
-        cardLayout.show(cardPanel, show? "spinner" : "browser");
+        cardLayout.show(cardPanel, show ? "spinner" : "browser");
     }
 
     private Runnable openFiles(KataDirectory directory) {
@@ -207,6 +200,7 @@ public class Manager implements KataSetupServiceClient {
     public AtomicBoolean getShouldFetchAndCreateFilesOnUrlLoad() {
         return shouldFetchAndCreateFilesOnUrlLoad;
     }
+
     public AtomicBoolean getShouldReloadUrl() {
         return shouldReloadUrl;
     }
